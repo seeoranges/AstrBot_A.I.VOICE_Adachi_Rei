@@ -1,4 +1,6 @@
 {
+  "home_dir": {"description": "运行目录：private 中存放主人账号与 DeepSeek 密钥。留空自动识别大肥鱼目录或 AstrBot 根目录，也可用 ADACHI_REI_HOME 指定", "type": "string", "default": ""},
+  "ffmpeg_path": {"description": "ffmpeg.exe 完整路径；留空先找运行目录的 ffmpeg/bin，再找 PATH", "type": "string", "default": ""},
   "emotion_segments": {"description": "按语句表达不同情绪；关闭后使用整条统一语气", "type": "bool", "default": true},
   "proactive_voice": {"description": "主人私聊的主动消息也补发日语语音", "type": "bool", "default": true},
   "prewarm": {"description": "插件启动时后台预热A.I.VOICE（编辑器会常驻，不调用模型）", "type": "bool", "default": true},

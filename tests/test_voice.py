@@ -121,7 +121,7 @@ def load_plugin():
     stub("astrbot.core.provider.provider", TTSProvider=TTSProvider)
     stub("astrbot.core.utils")
     stub("astrbot.core.utils.astrbot_path", get_astrbot_temp_path=tempfile.gettempdir)
-    spec = importlib.util.spec_from_file_location("_adachi_offline_tests", ROOT / "plugins" / "astrbot_plugin_adachi_aivoice" / "main.py")
+    spec = importlib.util.spec_from_file_location("_adachi_offline_tests", ROOT / "main.py")
     module = importlib.util.module_from_spec(spec)
     # Dataclasses, if used, look their module up during class creation.
     modules[spec.name] = module

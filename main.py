@@ -5,6 +5,7 @@ import json
 import math
 import os
 import re
+import shutil
 import time
 import uuid
 import unicodedata
@@ -23,11 +24,24 @@ from astrbot.core.provider.provider import TTSProvider
 from astrbot.core.utils.astrbot_path import get_astrbot_temp_path
 
 TYPE_NAME = "adachi_aivoice"
-DIR = os.path.abspath(os.environ.get("ADACHI_REI_HOME") or os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
-DAEMON = os.path.join(DIR, "tools", "aivoice-daemon.ps1")
-FFMPEG = os.path.join(DIR, "ffmpeg", "bin", "ffmpeg.exe")
-KEY_FILE = os.path.join(DIR, "private", "deepseek-key.txt")
-OWNER_FILE = os.path.join(DIR, "private", "owner-qq.txt")
+PLUGIN_DIR = os.path.dirname(os.path.abspath(__file__))
+_LEGACY_HOME = os.path.abspath(os.path.join(PLUGIN_DIR, "..", "..", "..", ".."))
+_ASTRBOT_HOME = os.path.abspath(os.path.join(PLUGIN_DIR, "..", "..", ".."))
+DEFAULT_HOME = _LEGACY_HOME if os.path.isdir(os.path.join(_LEGACY_HOME, "private")) else _ASTRBOT_HOME
+
+
+def _runtime_paths(config=None):
+    config = config or {}
+    home = os.path.abspath(config.get("home_dir") or os.environ.get("ADACHI_REI_HOME") or DEFAULT_HOME)
+    bundled = os.path.join(PLUGIN_DIR, "tools", "aivoice-daemon.ps1")
+    daemon = bundled if os.path.isfile(bundled) else os.path.join(home, "tools", "aivoice-daemon.ps1")
+    ffmpeg = config.get("ffmpeg_path") or os.path.join(home, "ffmpeg", "bin", "ffmpeg.exe")
+    if not config.get("ffmpeg_path") and not os.path.isfile(ffmpeg):
+        ffmpeg = shutil.which("ffmpeg") or ffmpeg
+    return home, daemon, ffmpeg, os.path.join(home, "private", "deepseek-key.txt"), os.path.join(home, "private", "owner-qq.txt")
+
+
+DIR, DAEMON, FFMPEG, KEY_FILE, OWNER_FILE = _runtime_paths()
 BRIDGE_TIMEOUT = 90
 TRANSCODE_TIMEOUT = 30
 CREATE_NO_WINDOW = 0x08000000 if os.name == "nt" else 0
@@ -148,6 +162,7 @@ class VoiceBridge:
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.DEVNULL,
             creationflags=CREATE_NO_WINDOW,
+            env=dict(os.environ, ADACHI_REI_HOME=DIR),
         )
         logger.info("[adachi_aivoice] 语音桥已启动")
 
@@ -572,8 +587,10 @@ async def speak_text(umo: str, text: str) -> bool:
 
 class AdachiAIVoice(Star):
     def __init__(self, context: Context, config=None) -> None:
+        global DIR, DAEMON, FFMPEG, KEY_FILE, OWNER_FILE
         super().__init__(context)
         self.config = config if config is not None else {}
+        DIR, DAEMON, FFMPEG, KEY_FILE, OWNER_FILE = _runtime_paths(self.config)
         self.owner = _read(OWNER_FILE)
         self._speech_lock = asyncio.Lock()
         self._stopping = False

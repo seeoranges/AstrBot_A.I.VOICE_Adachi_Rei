@@ -40,7 +40,7 @@ class InstallerTests(unittest.TestCase):
         self.assertEqual(len(snapshots),1)
         self.assertEqual((snapshots[0]/target.relative_to(self.runtime)).read_text(encoding='utf-8'),'# previous code')
         self.assertEqual(marker.read_text(encoding='utf-8'),'local-placeholder')
-        self.assertEqual(target.read_bytes(),(ROOT/'plugins/astrbot_plugin_adachi_aivoice/main.py').read_bytes())
+        self.assertEqual(target.read_bytes(),(ROOT/'main.py').read_bytes())
         self.assertTrue((self.runtime/'tools/aivoice-daemon.ps1').exists())
 
     def test_unknown_proactive_source_is_rejected_before_backups_or_writes(self):

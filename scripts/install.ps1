@@ -28,8 +28,7 @@ function Get-TextHash([string]$Path) {
 switch ($Component) {
     'voice' {
         foreach ($name in @('main.py','metadata.yaml','_conf_schema.json')) {
-            $rel = 'plugins\astrbot_plugin_adachi_aivoice\'+$name
-            Add-File $rel ('astrbot\data\'+$rel)
+            Add-File $name ('astrbot\data\plugins\astrbot_plugin_adachi_aivoice\'+$name)
         }
         Add-File 'tools\aivoice-daemon.ps1' 'tools\aivoice-daemon.ps1'
     }

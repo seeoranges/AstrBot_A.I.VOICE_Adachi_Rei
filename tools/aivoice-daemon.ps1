@@ -227,7 +227,11 @@ function Save-PresetManifest {
     [IO.File]::WriteAllText((Join-Path $script:VoicePresetBackup.snapshot 'manifest.json'),$json,(New-Object Text.UTF8Encoding($true)))
 }
 
-function Get-VoiceBackupRoot { return (Split-Path -Parent $PSScriptRoot) }
+function Get-VoiceBackupRoot {
+    $configured = [Environment]::GetEnvironmentVariable('ADACHI_REI_HOME','Process')
+    if ($configured) { return [IO.Path]::GetFullPath($configured) }
+    return (Split-Path -Parent $PSScriptRoot)
+}
 
 function Get-VoiceFileHash([string]$Path) {
     # Get-FileHash is a module-provided function and is not discoverable in some

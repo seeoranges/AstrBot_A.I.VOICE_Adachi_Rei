@@ -4,6 +4,8 @@
 
 本项目记录了一套实际在 Windows 上使用的 AstrBot 扩展。核心是 `astrbot_plugin_adachi_aivoice`，另外整理了主动消息语音集成、实例启动和掉线诊断工具。仓库提供代码、示例与离线测试；运行环境和个人数据需要在自己的电脑上配置。
 
+仓库根目录提供标准 AstrBot 插件入口 `main.py`、`metadata.yaml`、`_conf_schema.json` 和依赖声明，可以直接通过仓库链接安装。语音桥接脚本包含在插件的 `tools/` 中；商业音源仍需自己安装。
+
 ## 功能
 
 - **中文文字 + 日语语音**：将回复改写成足立レイ风格的日语台词，通过本机音源合成。
@@ -35,8 +37,8 @@ flowchart LR
 
 1. 先让现有 AstrBot 能正常收发 QQ 消息。
 2. 按 [安装与配置](docs/SETUP.md) 准备目录、私密文件和音源。
-3. 使用安装脚本把语音插件和桥接文件复制进现有安装。脚本先备份，不会启动 QQ 或发送测试消息。
-4. 在 AstrBot 后台重载语音插件，再由自己发一条消息验证。
+3. 在 AstrBot 后台选择「从链接安装」，输入本仓库地址；已有同名语音插件时先备份，避免重复安装。也可使用下面的备份安装脚本。
+4. 在插件配置中填写 `home_dir`（保存 `private/` 的目录），必要时填写 `ffmpeg_path`。重载插件后，由自己发一条消息验证。
 
 ```powershell
 # 在已完成 AstrBot / OneBot 部署的电脑上执行；替换为自己的安装目录。
@@ -49,7 +51,7 @@ powershell -NoProfile -File .\scripts\install.ps1 -Dir E:\dafeiyu -Component voi
 
 | 路径 | 内容 |
 | --- | --- |
-| `plugins/astrbot_plugin_adachi_aivoice/` | 核心语音插件与配置定义 |
+| `main.py`、`metadata.yaml`、`_conf_schema.json` | 可被市场解析和直接安装的核心插件入口 |
 | `plugins/astrbot_plugin_dafeiyu_*/` | 保留原署名的配套辅助插件 |
 | `tools/` | A.I.VOICE 桥接、实例启动/停止、状态探针与守护工具 |
 | `integrations/astrbot_plugin_proactive_chat/` | 主动消息语音集成、补丁与 AGPL 许可证 |

@@ -18,6 +18,8 @@
 
 插件从安装位置向上推导 `<安装目录>`，也可在启动 AstrBot 前通过进程环境变量 `ADACHI_REI_HOME` 显式指定。不要在代码里写 API 密钥。
 
+从仓库直接安装时，插件优先使用自身 `tools/` 中的桥接文件，无需手动复制到全局工具目录。已有大肥鱼布局会识别外层 `private/`；普通 AstrBot 布局默认使用 AstrBot 根目录。最明确的方式是在插件配置中填写 `home_dir`。`ffmpeg_path` 可指定程序路径；留空查找运行目录后，再查找 PATH。
+
 安装并激活自己的 A.I.VOICE Editor 和足立レイ音源。当前桥接默认 API DLL 路径为：
 
 ```text
@@ -37,6 +39,16 @@ C:\Program Files\AI\AIVoice\AIVoiceEditor\AI.Talk.Editor.Api.dll
 不要把内容填进 GitHub Issue、聊天截图或仓库文件。仓库没有创建或复制这些个人文件。
 
 ## 3. 安装语音
+
+推荐：在 AstrBot 的插件页面选择「从链接安装」，填写：
+
+```text
+https://github.com/seeoranges/AstrBot_A.I.VOICE_Adachi_Rei
+```
+
+这是单个语音插件的安装，不会自动安装 `plugins/` 下的其他辅助插件，不会执行运维脚本，也不会修改其他插件。
+
+已有手工安装目录时，也可以用下列脚本先备份再覆盖：
 
 在克隆下来的仓库中执行：
 

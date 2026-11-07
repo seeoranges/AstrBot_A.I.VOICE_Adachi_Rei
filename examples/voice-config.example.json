@@ -1,0 +1,8 @@
+{
+  "emotion_segments": true,
+  "proactive_voice": true,
+  "prewarm": true,
+  "latest_only": true,
+  "failure_hint": true,
+  "failure_hint_text": "（嗓子暂时哑了，这几句语音没念出来，文字照常。）"
+}

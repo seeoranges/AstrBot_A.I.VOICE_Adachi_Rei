@@ -1,0 +1,101 @@
+--- a/core/services/sender_service.py
++++ b/core/services/sender_service.py
+@@ -7,10 +7,12 @@
+ from __future__ import annotations
+ 
+ import asyncio
++import importlib
+ import math
+ import random
+ import re
+ import traceback
++import sys
+ from pathlib import Path
+ from typing import Any
+ 
+@@ -57,6 +59,18 @@
+ 
+     def __init__(self, plugin: Any) -> None:
+         self.plugin = plugin
++
++    def _adachi_voice_module(self, session_id):
++        name = "data.plugins.astrbot_plugin_adachi_aivoice.main"
++        # 不主动加载被禁用/尚未加载的可选插件，避免注册副作用。
++        if name not in sys.modules:
++            return None
++        try:
++            module = importlib.import_module(name)
++            active = getattr(module, "_ACTIVE_PLUGIN", None)
++            return module if active and active.can_speak_umo(session_id) else None
++        except Exception:
++            return None
+ 
+     # ------------------------------------------------------------------
+     # 文本分段
+@@ -474,6 +488,10 @@
+             )
+             return False
+ 
++        voice_module = self._adachi_voice_module(session_id)
++        delivered_texts = []
++        delivered_record = False
++
+         if event is None:
+             event = self.build_proactive_event(session_id)
+ 
+@@ -487,10 +505,13 @@
+ 
+         # 可选语音发送：合成成功即作为一条消息链直接送出。
+         is_tts_sent = False
+-        if tts_conf.get("enable_tts", True) and text.strip():
++        if voice_module is None and tts_conf.get("enable_tts", True) and text.strip():
+             try:
+                 logger.info("[主动消息] 尝试进行手动TTS喵。")
+                 tts_provider = plugin.context.get_using_tts_provider(umo=session_id)
++                if getattr(tts_provider, "provider_config", {}).get("type") == "adachi_aivoice":
++                    # 本地足立音源只由受主人/私聊约束的后置入口处理。
++                    tts_provider = None
+                 if tts_provider:
+                     audio_path = await tts_provider.get_audio(text)
+                     if audio_path:
+@@ -555,6 +576,9 @@
+                     for idx, comp in enumerate(send_chain):
+                         if await self.send_chain(session_id, event, [comp]) is True:
+                             any_sent = True
++                            if isinstance(comp, Plain):
++                                delivered_texts.append(comp.text)
++                            delivered_record |= isinstance(comp, Record)
+                         if idx < len(send_chain) - 1:
+                             interval = await self.calc_interval(
+                                 getattr(comp, "text", "") or "", seg_conf
+@@ -565,6 +589,8 @@
+                             await asyncio.sleep(interval)
+                 elif await self.send_chain(session_id, event, send_chain) is True:
+                     any_sent = True
++                    delivered_texts.extend(comp.text for comp in send_chain if isinstance(comp, Plain))
++                    delivered_record |= any(isinstance(comp, Record) for comp in send_chain)
+ 
+                 if plugin.telemetry and plugin.telemetry.enabled:
+                     plugin._track_task(
+@@ -590,6 +616,8 @@
+ 
+         if event is not None and EventType is not None:
+             try:
++                if voice_module is not None:
++                    event.set_extra("_adachi_voice_handled", True)
+                 await dispatch_event_hook(event, EventType.OnAfterMessageSentEvent)
+             except Exception as e:
+                 logger.error(f"[主动消息] 派发发送后钩子失败喵: {e}")
+@@ -601,6 +629,12 @@
+                 f"[主动消息] {plugin.session_service.get_session_log_str(session_id, session_config)} 的主动消息未能送达任何平台喵。"
+             )
+             return False
++
++        if voice_module is not None and delivered_texts and not delivered_record and not is_tts_sent:
++            try:
++                await voice_module.speak_text(session_id, "，".join(delivered_texts))
++            except Exception:
++                logger.warning("[主动消息] 附加日语语音失败，已发送的文字保持成功")
+ 
+         # 群聊发送成功后重置沉默倒计时，等待下一轮静默再触发。
+         if is_group_umo(session_id):

@@ -1,0 +1,2 @@
+aiohttp>=3.9,<4
+# AstrBot is supplied by the host installation; see docs/SETUP.md.

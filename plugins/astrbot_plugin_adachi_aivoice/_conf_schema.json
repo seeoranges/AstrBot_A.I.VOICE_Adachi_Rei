@@ -1,0 +1,8 @@
+{
+  "emotion_segments": {"description": "按语句表达不同情绪；关闭后使用整条统一语气", "type": "bool", "default": true},
+  "proactive_voice": {"description": "主人私聊的主动消息也补发日语语音", "type": "bool", "default": true},
+  "prewarm": {"description": "插件启动时后台预热A.I.VOICE（编辑器会常驻，不调用模型）", "type": "bool", "default": true},
+  "latest_only": {"description": "同一会话连续回复只念最新，关闭时逐条排队", "type": "bool", "default": true},
+  "failure_hint": {"description": "连续失败3次后补发一次提示，成功后重置", "type": "bool", "default": true},
+  "failure_hint_text": {"description": "连续语音失败提示文案", "type": "string", "default": "（嗓子暂时哑了，这几句语音没念出来，文字照常。）"}
+}

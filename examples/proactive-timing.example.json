@@ -1,0 +1,13 @@
+{
+  "note": "说明性示例，请在主动消息插件界面中设置，不要直接替换完整生产配置。",
+  "timezone": "Asia/Shanghai",
+  "friend_interval_minutes": {
+    "min": 30,
+    "max": 90
+  },
+  "quiet_hours": {
+    "start": "23:00",
+    "end": "08:00"
+  },
+  "max_unanswered": 4
+}

@@ -1,0 +1,7 @@
+name: astrbot_plugin_adachi_aivoice
+display_name: 足立零的声音（A.I.VOICE）
+desc: 用本机 A.I.VOICE Editor 的足立レイ音源，把她的中文回复改写成日语口语后合成语音，在主人私聊里每条回复后面补一条真声语音。她只有日语词典，所以语音是日语，文字仍是中文。
+help: 需要已安装的 A.I.VOICE Editor 和足立レイ音源，以及安装目录下的 tools/aivoice-daemon.ps1 和 private 中的密钥、主人账号文件。安装路径自动推导，也可用 ADACHI_REI_HOME 指定。
+version: v0.4.0
+author: dafeiyu-local
+repo: "https://github.com/seeoranges/AstrBot_A.I.VOICE_Adachi_Rei"

@@ -1,0 +1,21 @@
+name: Offline tests
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Python regression tests
+        run: python -B -m unittest discover -s tests -p 'test_*.py'
+      - name: PowerShell regression tests
+        shell: powershell
+        run: .\scripts\run-tests.ps1
+      - name: Distribution check
+        run: python -B scripts/check-package.py
